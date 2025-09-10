@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareShelf - Own Less, Share More</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#4FD1C5',
+                            DEFAULT: '#38B2AC',
+                            dark: '#319795',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+    <!-- App Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow-md sticky top-0 z-50">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <a href="#"
+                            class="flex-shrink-0 flex items-center gap-2 text-brand-dark font-bold text-2xl nav-link"
+                            data-page="home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="h-8 w-8 text-brand">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                            ShareShelf
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#"
+                                class="text-gray-700 hover:bg-gray-100 hover:text-brand-dark px-3 py-2 rounded-md text-sm font-medium nav-link"
+                                data-page="listings">Browse Items</a>
+                            <a href="#"
+                                class="text-gray-700 hover:bg-gray-100 hover:text-brand-dark px-3 py-2 rounded-md text-sm font-medium nav-link"
+                                data-page="home">How It Works</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div id="auth-container" class="flex items-center">
+                            <!-- This will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow">
+            <!-- Home Page -->
+            <div id="home" class="page active">
+                <!-- Hero Section -->
+                <section class="bg-brand-light text-white pt-20 pb-28 text-center">
+                    <div class="container mx-auto px-4">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-4">Own less. Share more.</h1>
+                        <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Your community's lending library for tools,
+                            kitchenware, camping gear, and so much more.</p>
+                        <div class="max-w-xl mx-auto">
+                            <div class="relative">
+                                <input id="home-search" type="search"
+                                    placeholder="Search for a power drill, tent, or pasta maker..."
+                                    class="w-full p-4 rounded-full text-gray-800 focus:outline-none focus:ring-4 focus:ring-brand-dark focus:ring-opacity-50">
+                                <button id="home-search-btn"
+                                    class="absolute top-1/2 right-2 -translate-y-1/2 bg-brand-dark text-white px-6 py-2.5 rounded-full hover:bg-brand-darker transition-colors">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- How It Works Section -->
+                <section class="py-20 bg-white">
+                    <div class="container mx-auto px-4 text-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-12">How It Works</h2>
+                        <div class="grid md:grid-cols-3 gap-12">
+                            <div class="flex flex-col items-center">
+                                <div class="bg-brand-light rounded-full p-6 mb-4 inline-block">
+                                    <i data-lucide="search" class="text-white h-10 w-10"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">1. Find What You Need</h3>
+                                <p class="text-gray-600">Search for an item you need from a neighbor in your community.
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="bg-brand-light rounded-full p-6 mb-4 inline-block">
+                                    <i data-lucide="calendar-check" class="text-white h-10 w-10"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">2. Request to Borrow</h3>
+                                <p class="text-gray-600">Send a request with your desired dates. The lender reviews and
+                                    approves.</p>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="bg-brand-light rounded-full p-6 mb-4 inline-block">
+                                    <i data-lucide="arrow-left-right" class="text-white h-10 w-10"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">3. Arrange & Return</h3>
+                                <p class="text-gray-600">Coordinate pickup, use the item respectfully, and return it on
+                                    time. Build community trust!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Listings Page -->
+            <div id="listings" class="page">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-8">Browse Available Items</h1>
+                    <!-- Placeholder for filters -->
+                    <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <!-- Items will be injected here by JS -->
+                    </div>
+                    <div id="no-items-message" class="hidden text-center py-16">
+                        <i data-lucide="package-x" class="h-16 w-16 mx-auto text-gray-400 mb-4"></i>
+                        <h2 class="text-2xl font-semibold text-gray-700">No items found</h2>
+                        <p class="text-gray-500 mt-2">Be the first to lend an item in your community!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Detail Page -->
+            <div id="item-detail" class="page">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
+                    <p id="user-id-display" class="text-sm text-gray-500 mb-8"></p>
+
+                    <div class="flex border-b mb-6">
+                        <button
+                            class="tab-link active-tab px-4 py-2 text-brand-dark border-b-2 border-brand-dark font-semibold"
+                            data-tab="my-items">My Lent Items</button>
+                        <button class="tab-link px-4 py-2 text-gray-500" data-tab="add-item">Lend a New Item</button>
+                    </div>
+
+                    <div id="my-items" class="tab-content active-content">
+                        <h2 class="text-2xl font-semibold mb-4">Items I'm Lending</h2>
+                        <div id="my-items-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- User's items will be injected here -->
+                        </div>
+                        <div id="no-my-items-message" class="hidden text-center py-16">
+                            <i data-lucide="package-plus" class="h-16 w-16 mx-auto text-gray-400 mb-4"></i>
+                            <h2 class="text-2xl font-semibold text-gray-700">You haven't listed any items yet.</h2>
+                            <p class="text-gray-500 mt-2">Click 'Lend a New Item' to get started!</p>
+                        </div>
+                    </div>
+
+                    <div id="add-item" class="tab-content">
+                        <h2 class="text-2xl font-semibold mb-4">Lend a New Item</h2>
+                        <form id="add-item-form" class="max-w-2xl bg-white p-8 rounded-lg shadow">
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="itemName" class="block text-sm font-medium text-gray-700">Item
+                                        Name</label>
+                                    <input type="text" id="itemName" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="itemDescription"
+                                        class="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea id="itemDescription" rows="3" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand sm:text-sm"></textarea>
+                                </div>
+                                <div>
+                                    <label for="itemCategory"
+                                        class="block text-sm font-medium text-gray-700">Category</label>
+                                    <select id="itemCategory" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand sm:text-sm">
+                                        <option>Tools & DIY</option>
+                                        <option>Kitchen Appliances</option>
+                                        <option>Electronics</option>
+                                        <option>Outdoor & Sports</option>
+                                        <option>Party & Events</option>
+                                        <option>Kids & Baby Gear</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="itemImageUrl" class="block text-sm font-medium text-gray-700">Image
+                                        URL</label>
+                                    <input type="url" id="itemImageUrl" required
+                                        placeholder="https://example.com/image.jpg"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand focus:ring-brand sm:text-sm">
+                                </div>
+                            </div>
+                            <div class="mt-8">
+                                <button type="submit"
+                                    class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition-colors">Add
+                                    Item to ShareShelf</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white">
+            <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+                <p>&copy; 2025 ShareShelf. All Rights Reserved.</p>
+                <p class="text-sm text-gray-400 mt-2">Building stronger communities through sharing.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-50 items-center justify-center hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm m-4 z-10">
+            <h2 class="text-2xl font-bold text-center mb-6">Welcome to ShareShelf</h2>
+            <p class="text-center text-gray-600 mb-6">Sign in to start borrowing and lending with your community.</p>
+            <div id="auth-message" class="text-center text-red-500 mb-4"></div>
+            <button id="signin-btn"
+                class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition-colors">Sign
+                In Anonymously</button>
+            <p class="text-xs text-gray-500 mt-4 text-center">For demonstration purposes, you will be signed in with a
+                temporary anonymous account.</p>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 z-50 items-center justify-center hidden">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm m-4 z-10 text-center">
+            <div id="alert-icon" class="mx-auto mb-4"></div>
+            <h3 id="alert-title" class="text-xl font-bold mb-2"></h3>
+            <p id="alert-message" class="text-gray-600 mb-6"></p>
+            <button id="alert-close-btn"
+                class="bg-brand hover:bg-brand-dark text-white font-bold py-2 px-8 rounded-lg transition-colors">OK</button>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- App State ---
+        let db, auth;
+        let currentUser = null;
+        let allItems = [];
+
+        // --- Firebase Config ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO_KEY", authDomain: "demo.firebaseapp.com", projectId: "demo-project" };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- UI Elements ---
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const authContainer = document.getElementById('auth-container');
+        const authModal = document.getElementById('auth-modal');
+        const signinBtn = document.getElementById('signin-btn');
+        const addItemForm = document.getElementById('add-item-form');
+        const listingsGrid = document.getElementById('listings-grid');
+        const myItemsList = document.getElementById('my-items-list');
+        const homeSearchBtn = document.getElementById('home-search-btn');
+        const homeSearchInput = document.getElementById('home-search');
+
+
+        // --- Navigation ---
+        function showPage(pageId) {
+            if (!currentUser && (pageId === 'dashboard')) {
+                showAuthModal();
+                return;
+            }
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(link.dataset.page);
+            });
+        });
+
+        // --- Alert Modal ---
+        function showAlert(title, message, isSuccess = true) {
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-message').textContent = message;
+            const iconContainer = document.getElementById('alert-icon');
+            if (isSuccess) {
+                iconContainer.innerHTML = `<svg class="h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                iconContainer.innerHTML = `<svg class="h-12 w-12 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+            document.getElementById('alert-modal').classList.remove('hidden');
+            document.getElementById('alert-modal').classList.add('flex');
+        }
+        document.getElementById('alert-close-btn').addEventListener('click', () => {
+            document.getElementById('alert-modal').classList.add('hidden');
+            document.getElementById('alert-modal').classList.remove('flex');
+        });
+        document.querySelector('#alert-modal .modal-backdrop').addEventListener('click', () => {
+            document.getElementById('alert-modal').classList.add('hidden');
+            document.getElementById('alert-modal').classList.remove('flex');
+        });
+
+        // --- Authentication ---
+        function showAuthModal() {
+            authModal.classList.remove('hidden');
+            authModal.classList.add('flex');
+        }
+
+        function hideAuthModal() {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('flex');
+        }
+
+        function updateAuthUI(user) {
+            currentUser = user;
+            authContainer.innerHTML = '';
+            if (user) {
+                const welcomeText = document.createElement('span');
+                welcomeText.className = 'text-gray-700 text-sm hidden sm:block';
+                welcomeText.textContent = `Welcome!`;
+
+                const dashboardButton = document.createElement('a');
+                dashboardButton.href = '#';
+                dashboardButton.className = 'nav-link ml-4 bg-brand-light text-white px-3 py-2 rounded-md text-sm font-medium';
+                dashboardButton.textContent = 'My Dashboard';
+                dashboardButton.dataset.page = 'dashboard';
+                dashboardButton.addEventListener('click', (e) => { e.preventDefault(); showPage('dashboard'); });
+
+                const signOutButton = document.createElement('button');
+                signOutButton.className = 'ml-2 text-gray-500 hover:text-brand-dark px-3 py-2 rounded-md text-sm font-medium';
+                signOutButton.textContent = 'Sign Out';
+                signOutButton.onclick = () => signOut(auth);
+
+                authContainer.append(welcomeText, dashboardButton, signOutButton);
+                hideAuthModal();
+                if (document.getElementById('dashboard').classList.contains('active')) {
+                    document.getElementById('user-id-display').textContent = `Your User ID: ${user.uid}`;
+                }
+            } else {
+                const signInButton = document.createElement('button');
+                signInButton.className = 'bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-md text-sm font-medium';
+                signInButton.textContent = 'Sign In / Sign Up';
+                signInButton.onclick = showAuthModal;
+                authContainer.appendChild(signInButton);
+            }
+        }
+
+        // --- Firestore ---
+        async function addUserToFirestore(user) {
+            const userRef = doc(db, `/artifacts/${appId}/public/data/users`, user.uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    createdAt: new Date(),
+                    displayName: `User ${user.uid.substring(0, 6)}`
+                });
+            }
+        }
+
+        function listenToItems() {
+            const itemsRef = collection(db, `/artifacts/${appId}/public/data/items`);
+            onSnapshot(query(itemsRef), (snapshot) => {
+                allItems = [];
+                snapshot.forEach((doc) => {
+                    allItems.push({ id: doc.id, ...doc.data() });
+                });
+                renderAllItems(allItems);
+                renderMyItems(allItems);
+            });
+        }
+
+        // --- Rendering ---
+        function renderAllItems(items, filterText = '') {
+            listingsGrid.innerHTML = '';
+            const filteredItems = filterText ? items.filter(item => item.name.toLowerCase().includes(filterText.toLowerCase())) : items;
+
+            if (filteredItems.length === 0) {
+                document.getElementById('no-items-message').classList.remove('hidden');
+            } else {
+                document.getElementById('no-items-message').classList.add('hidden');
+            }
+
+            filteredItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow overflow-hidden group cursor-pointer';
+                card.innerHTML = `
+                    <div class="w-full h-48 bg-gray-200">
+                        <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-500">${item.category}</p>
+                        <h3 class="text-lg font-semibold text-gray-800 truncate">${item.name}</h3>
+                    </div>
+                `;
+                card.addEventListener('click', () => showItemDetail(item));
+                listingsGrid.appendChild(card);
+            });
+        }
+
+        function renderMyItems(items) {
+            if (!currentUser) return;
+            myItemsList.innerHTML = '';
+            const myItems = items.filter(item => item.lenderId === currentUser.uid);
+
+            if (myItems.length === 0) {
+                document.getElementById('no-my-items-message').classList.remove('hidden');
+            } else {
+                document.getElementById('no-my-items-message').classList.add('hidden');
+            }
+
+            myItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow p-4 flex items-start gap-4';
+                card.innerHTML = `
+                    <img src="${item.imageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
+                    <div>
+                        <h3 class="font-semibold text-gray-800">${item.name}</h3>
+                        <p class="text-sm text-gray-500">${item.category}</p>
+                    </div>
+                 `;
+                myItemsList.appendChild(card);
+            });
+        }
+
+        async function showItemDetail(item) {
+            const detailContainer = document.getElementById('item-detail');
+            const userRef = doc(db, `/artifacts/${appId}/public/data/users`, item.lenderId);
+            const userSnap = await getDoc(userRef);
+            const lender = userSnap.exists() ? userSnap.data() : { displayName: 'Unknown User' };
+
+            detailContainer.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-auto object-cover rounded-lg shadow-lg">
+                    </div>
+                    <div>
+                        <p class="text-brand font-semibold">${item.category}</p>
+                        <h1 class="text-4xl font-bold text-gray-900 mt-1 mb-4">${item.name}</h1>
+                        <p class="text-gray-600 mb-6">${item.description}</p>
+                        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                            <h3 class="font-semibold text-gray-800">Lender Information</h3>
+                            <p class="text-gray-600">Lent by: ${lender.displayName}</p>
+                            <p class="text-xs text-gray-500">User ID: ${item.lenderId}</p>
+                        </div>
+                        <button id="borrow-request-btn" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition-colors">Request to Borrow</button>
+                    </div>
+                </div>
+             `;
+            showPage('item-detail');
+
+            document.getElementById('borrow-request-btn').addEventListener('click', () => {
+                if (!currentUser) {
+                    showAlert('Authentication Required', 'Please sign in to borrow items.', false);
+                    showAuthModal();
+                } else if (currentUser.uid === item.lenderId) {
+                    showAlert('Action Not Allowed', 'You cannot borrow your own item.', false);
+                } else {
+                    showAlert('Request Sent!', `Your request to borrow "${item.name}" has been sent. This is a demo feature.`, true);
+                }
+            });
+        }
+
+        // --- Event Handlers ---
+        addItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showAlert('Authentication Required', 'Please sign in to lend an item.', false);
+                return;
+            }
+            const newItem = {
+                name: document.getElementById('itemName').value,
+                description: document.getElementById('itemDescription').value,
+                category: document.getElementById('itemCategory').value,
+                imageUrl: document.getElementById('itemImageUrl').value,
+                lenderId: currentUser.uid,
+                createdAt: new Date(),
+                status: 'available'
+            };
+
+            try {
+                await addDoc(collection(db, `/artifacts/${appId}/public/data/items`), newItem);
+                showAlert('Success!', 'Your item has been listed on ShareShelf.', true);
+                addItemForm.reset();
+                // Switch back to the 'my items' tab
+                document.querySelector('.tab-link[data-tab="my-items"]').click();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showAlert('Error', 'Could not list your item. Please try again.', false);
+            }
+        });
+
+        homeSearchBtn.addEventListener('click', () => {
+            const searchTerm = homeSearchInput.value;
+            renderAllItems(allItems, searchTerm);
+            showPage('listings');
+        });
+
+        // Dashboard Tabs
+        document.querySelectorAll('.tab-link').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active-tab', 'text-brand-dark', 'border-brand-dark', 'font-semibold'));
+                button.classList.add('active-tab', 'text-brand-dark', 'border-brand-dark', 'font-semibold');
+
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
+                document.getElementById(button.dataset.tab).classList.add('active-content');
+            });
+        });
+
+        // --- Initialization ---
+        function init() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        await addUserToFirestore(user);
+                        updateAuthUI(user);
+                        listenToItems();
+                    } else {
+                        updateAuthUI(null);
+                        renderAllItems([]); // Clear items if logged out
+                    }
+                });
+
+                signinBtn.onclick = async () => {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Anonymous sign-in failed", error);
+                        document.getElementById('auth-message').textContent = "Sign-in failed. Please try again.";
+                    }
+                };
+
+            } catch (error) {
+                console.error("Firebase initialization failed: ", error);
+                document.body.innerHTML = `<div class="p-8 text-center text-red-600"><h2>Error initializing the application.</h2><p>Please check the console for more details.</p></div>`;
+            }
+            lucide.createIcons();
+        }
+
+        init();
+
+    </script>
+</body>
+
+</html>
